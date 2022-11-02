@@ -80,3 +80,16 @@ CUDA_VISIBLE_DEVICES=0 python main.py --drop_out --early_stopping --lr 2e-4 --k_
 
 ##### 20221007
 python create_patches_fp.py --source heatmap_generate/luad_test/zesis --save_dir 20221003 --patch_size 512 --step_size 512 --preset 202201007_zesis.csv --patch_level 0 --seg --patch
+
+##### 20221028
+python create_patches_fp.py --source /media/user/data/CPTAC-LUAD/train --save_dir lung256/cptac_luad --patch_size 256 --step_size 256 --preset 1028_lung.csv --patch_level 0 --seg --patch
+python create_patches_fp.py --source /media/user/TCGA_lung/TCGA-LUAD-slides --save_dir lung256/tcga_luad --patch_size 512 --step_size 512 --preset 1028_lung.csv --patch_level 0 --seg --patch
+python create_patches_fp.py --source /media/user/data/CPTAC-LSCC/normal --save_dir lung256/cptac_lscc --patch_size 256 --step_size 256 --preset 1028_lscc.csv --patch_level 0 --seg --patch
+
+CUDA_VISIBLE_DEVICES=0  python extract_features_fp.py --data_h5_dir lung256/cptac_luad --data_slide_dir /media/user/data/CPTAC-LUAD/train --csv_path lung256/cptac_luad/1.csv --feat_dir lung256/cptac_luad_feat --batch_size 128 --slide_ext .svs
+CUDA_VISIBLE_DEVICES=1  python extract_features_fp.py --data_h5_dir lung256/cptac_lscc --data_slide_dir /media/user/data/CPTAC-LSCC/normal --csv_path lung256/cptac_lscc/1.csv --feat_dir lung256/cptac_lscc_feat --batch_size 128 --slide_ext .svs
+CUDA_VISIBLE_DEVICES=2  python extract_features_fp.py --data_h5_dir lung256/tcga_luad --data_slide_dir /media/user/TCGA_lung/TCGA-LUAD-slides --csv_path lung256/tcga_luad/1.csv --feat_dir lung256/tcga_luad_feat --batch_size 32 --slide_ext .svs  --custom_downsample 2
+
+python create_splits_seq.py --task task_1_tumor_vs_normal --seed 1 --label_frac 1 --k 10
+
+CUDA_VISIBLE_DEVICES=0  python main.py --drop_out --early_stopping --lr 2e-4 --k 10 --label_frac 1 --exp_code task_1_lung256 --weighted_sample --bag_loss ce --inst_loss svm --task task_1_tumor_vs_normal --model_type clam_sb --log_data --data_root_dir ./ --split_dir task_1_tumor_vs_normal_100_lung256 --B 8

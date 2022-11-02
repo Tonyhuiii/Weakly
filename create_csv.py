@@ -178,3 +178,54 @@ for j in cptac_lscc_normal_path:
     i=i+1
 
 fconv.close()
+
+
+##### 20221031  lung256
+import csv
+import os
+
+cptac_luad_path = 'lung256/cptac_luad_feat/h5_files'
+file_list = os.listdir(cptac_luad_path)
+file_list1=[ i.split('.')[0] for i in file_list]
+file_list1.sort()
+fconv = open('dataset_csv/lung256_1031.csv', 'w')
+fconv.write('case_id,slide_id,label\n')
+fconv.close()
+i=0
+with open('luad.csv') as f:
+    f_csv=csv.reader(f)
+    fconv = open('dataset_csv/lung256_1031.csv', 'a')
+    for row in f_csv:
+        if row[1] in file_list1:
+            case_id='patient_'+str(i)
+            slide_id=row[1]
+            label=row[2]
+            i=i+1
+            fconv.write('{},{},{}\n'.format(case_id,slide_id,label))
+    fconv.close()
+                
+
+tcga_luad_path=os.listdir('lung256/tcga_luad_feat/h5_files')
+
+i=1055
+fconv = open('dataset_csv/lung256_1031.csv', 'a')
+for j in tcga_luad_path:
+    case_id='patient_'+str(i)
+    slide_id=j[:-3]
+    label='tumor_tissue'
+    fconv.write('{},{},{}\n'.format(case_id,slide_id,label))
+    i=i+1
+fconv.close()
+
+
+cptac_lscc_normal_path=os.listdir('lung256/cptac_lscc_feat/h5_files')
+fconv = open('dataset_csv/lung256_1031.csv', 'a')
+i=1595
+for j in cptac_lscc_normal_path:
+    case_id='patient_'+str(i)
+    slide_id=j[:-3]
+    label='normal_tissue'
+    fconv.write('{},{},{}\n'.format(case_id,slide_id,label))
+    i=i+1
+
+fconv.close()
